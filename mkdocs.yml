@@ -1,0 +1,73 @@
+site_name: Data Lake Documentation
+site_description: Documentação do projeto Data Lake com MinIO, Spark e Trino
+site_author: Time de Data Engineering
+repo_url: https://github.com/seu-usuario/data-lab
+
+theme:
+  name: material
+  language: pt-BR
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Guia de Início:
+    - Instalação: getting-started/installation.md
+    - Configuração: getting-started/configuration.md
+  - Componentes:
+    - MinIO: components/minio.md
+    - Spark: components/spark.md
+    - Trino: components/trino.md
+    - Hive Metastore: components/hive.md
+  - Tutoriais:
+    - Ingestão de Dados: tutorials/data-ingestion.md
+    - Consultas SQL: tutorials/sql-queries.md
+    - Delta Lake: tutorials/delta-lake.md
+  - Referência:
+    - Arquitetura: reference/architecture.md
+    - APIs: reference/apis.md
+    - Configurações: reference/configurations.md
+  - Desenvolvimento:
+    - Contribuição: development/contributing.md
+    - Guia de Estilo: development/style-guide.md
+    - Testes: development/testing.md
+  - FAQ: faq.md

@@ -1,0 +1,78 @@
+version: '3'
+services:
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - ./data:/data
+    networks:
+      - datalake-network
+
+  spark:
+    image: my-spark
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+    volumes:
+      - ./notebooks:/notebooks
+    depends_on:
+      - minio
+    networks:
+      - datalake-network
+
+  trino:
+    image: my-trino
+    ports:
+      - "8080:8080"
+    depends_on:
+      - minio
+      - hive-metastore
+    networks:
+      - datalake-network
+
+  mariadb:
+    image: mariadb:10.5
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: hive
+      MYSQL_PASSWORD: hive
+      MYSQL_DATABASE: metastore_db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - datalake-network
+
+  hive-metastore:
+    build:
+      context: ./hive
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_HOST: mariadb
+      MYSQL_PORT: 3306
+      MYSQL_USER: hive
+      MYSQL_PASSWORD: hive
+      MYSQL_DATABASE: metastore_db
+      SKIP_SCHEMA_INIT: "false"
+    volumes:
+      - ./hive/logs:/opt/hive/logs
+      - ./hive/warehouse:/opt/hive/warehouse
+    ports:
+      - "9083:9083"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - datalake-network
+
+networks:
+  datalake-network:
+    external: true 

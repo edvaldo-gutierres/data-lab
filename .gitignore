@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# IDEs e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Arquivos de ambiente
+.env
+.env.*
+
+# Outros
+.DS_Store
+Thumbs.db
+
+# Diretórios de dados
+data/
+notebooks/.ipynb_checkpoints/
+
+# Arquivos temporários
+tmp/
+temp/
+*.tmp
+
+# Arquivos de IDE
+.DS_Store
+
+# Arquivos de build
+*.egg-info/
+*.egg
+
+# Arquivos de backup
+*.bak
+*.backup
+*~
+
+# Arquivos de dependências
+venv/
+.venv/ 
