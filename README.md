@@ -1,6 +1,6 @@
-# Data Lake com MinIO, Spark e Trino
+# Data Lake com MinIO, Spark e Dremio
 
-Este projeto implementa um data lake utilizando MinIO como armazenamento de objetos, Apache Spark para processamento de dados e Trino para consultas SQL. O ambiente é containerizado usando Docker e inclui um Hive Metastore para gerenciamento de metadados.
+Este projeto implementa um data lake utilizando MinIO como armazenamento de objetos, Apache Spark para processamento de dados e Dremio para consultas SQL. O ambiente é containerizado usando Docker e inclui um Hive Metastore para gerenciamento de metadados.
 
 ## Arquitetura
 
@@ -8,7 +8,7 @@ O projeto consiste nos seguintes componentes:
 
 - **MinIO**: Servidor de armazenamento de objetos compatível com S3
 - **Apache Spark**: Framework para processamento distribuído de dados
-- **Trino**: Motor de consulta SQL distribuído
+- **Dremio**: Plataforma de análise de dados
 - **Hive Metastore**: Gerenciamento de metadados para tabelas
 - **MariaDB**: Banco de dados para o Hive Metastore
 
@@ -39,6 +39,11 @@ O projeto consiste nos seguintes componentes:
 │       └── jvm.config             # Configurações da JVM
 ├── docker-compose.yml    # Configuração dos serviços
 ├── Makefile             # Comandos de automação
+├── docs/                  # Documentação do projeto
+│   ├── Guia de Instalação  # Instruções para configurar o ambiente
+│   ├── Tutoriais          # Exemplos de uso e tutoriais
+│   ├── Referência de API  # Documentação das APIs
+│   └── Notas de Versão    # Histórico de mudanças e atualizações
 └── README.md            # Documentação do projeto
 ```
 
@@ -73,8 +78,8 @@ make up
 - **Spark UI**: http://localhost:4040
   - Interface web do Spark
 
-- **Trino UI**: http://localhost:8080
-  - Interface web do Trino
+- **Dremio UI**: http://localhost:9047
+  - Interface web do Dremio
 
 ## Comandos Disponíveis
 
@@ -98,7 +103,7 @@ O ambiente está configurado para suportar:
    - Armazenamento em formato Delta Lake
 
 2. **Consultas**:
-   - SQL via Trino
+   - SQL via Dremio
    - Processamento distribuído via Spark
    - Notebooks Jupyter para análise
 
@@ -114,10 +119,9 @@ O ambiente está configurado para suportar:
 - Delta Lake: 2.3.0
 - Portas: 8888 (Jupyter), 4040 (UI)
 
-### Trino
-- Versão: 423
-- Porta: 8080
-- Catalogs: minio, hive
+### Dremio
+- Versão: [especificar versão]
+- Porta: 9047
 
 ### Hive Metastore
 - Versão: 3.1.3
@@ -131,14 +135,14 @@ Para desenvolvimento local:
 1. Os notebooks Jupyter estão disponíveis em `notebooks/`
 2. Os dados podem ser acessados via MinIO ou diretamente no filesystem
 3. O Hive Metastore gerencia os metadados das tabelas
-4. O Trino permite consultas SQL sobre os dados
+4. O Dremio permite consultas SQL sobre os dados
 
 ## Troubleshooting
 
 ### Logs
 - MinIO: `docker logs data-lab-minio-1`
 - Spark: `docker logs data-lab-spark-1`
-- Trino: `docker logs data-lab-trino-1`
+- Dremio: `docker logs data-lab-dremio-1`
 - Hive: `docker logs data-lab-hive-metastore-1`
 
 ### Problemas Comuns
@@ -147,7 +151,7 @@ Para desenvolvimento local:
    - Confirme se o banco de dados foi criado
    - Verifique as configurações no hive-site.xml
 
-2. Se o Trino não conseguir se conectar ao MinIO:
+2. Se o Dremio não conseguir se conectar ao MinIO:
    - Verifique se o bucket 'raw' existe
    - Confirme as credenciais do MinIO
    - Verifique a conectividade entre os containers
@@ -219,59 +223,34 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para d
    - URL: http://localhost:18080
    - Requer configuração adicional do History Server
 
-### Trino
+### Dremio
 1. **Interface Web**:
-   - URL: http://localhost:8080
-   - Credenciais: admin/(sem senha)
+   - URL: http://localhost:9047
    - Funcionalidades:
      - Editor SQL
-     - Visualização de queries
+     - Visualização de datasets
      - Monitoramento de performance
-     - Gerenciamento de catalogs
+     - Gerenciamento de fontes de dados
 
 2. **Exemplo de Consulta**:
    ```sql
    -- Listar schemas disponíveis
-   SHOW SCHEMAS FROM minio;
+   SHOW SCHEMAS;
    
    -- Listar tabelas
-   SHOW TABLES FROM minio.default;
+   SHOW TABLES;
    
    -- Consultar dados
-   SELECT * FROM minio.default.minha_tabela;
-   ```
-
-3. **CLI**:
-   ```bash
-   docker exec -it data-lab-trino-1 trino
+   SELECT * FROM minha_tabela;
    ```
 
 ### Hive Metastore
 1. **API Thrift**:
    - Endpoint: thrift://localhost:9083
-   - Usado internamente pelo Spark e Trino
+   - Usado internamente pelo Spark e Dremio
    - Não requer acesso direto
 
 2. **Beeline**:
    ```bash
    docker exec -it data-lab-hive-metastore-1 beeline -u jdbc:hive2://localhost:10000
    ```
-
-### MariaDB (Hive Metastore)
-1. **CLI**:
-   ```bash
-   docker exec -it data-lab-mariadb-1 mysql -u hive -p
-   # Senha: hive
-   ```
-
-2. **Consultas Úteis**:
-   ```sql
-   -- Listar bancos de dados
-   SHOW DATABASES;
-   
-   -- Usar o banco metastore
-   USE metastore_db;
-   
-   -- Listar tabelas
-   SHOW TABLES;
-   ``` 

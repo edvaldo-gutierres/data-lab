@@ -26,10 +26,10 @@ services:
     networks:
       - datalake-network
 
-  trino:
-    image: my-trino
+  dremio:
+    image: dremio/dremio-oss
     ports:
-      - "8080:8080"
+      - "9047:9047"
     depends_on:
       - minio
       - hive-metastore

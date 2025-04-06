@@ -1,6 +1,6 @@
 # Bem-vindo ao Data Lake
 
-Esta é a documentação oficial do projeto Data Lake, uma solução moderna e escalável para armazenamento e processamento de dados usando MinIO, Apache Spark e Trino.
+Esta é a documentação oficial do projeto Data Lake, uma solução moderna e escalável para armazenamento e processamento de dados usando MinIO, Apache Spark e Dremio.
 
 ## Visão Geral
 
@@ -8,7 +8,7 @@ O projeto implementa um data lake completo usando tecnologias open source:
 
 - **MinIO**: Armazenamento de objetos compatível com S3
 - **Apache Spark**: Processamento distribuído de dados
-- **Trino**: Consultas SQL distribuídas
+- **Dremio**: Consultas SQL distribuídas
 - **Hive Metastore**: Gerenciamento de metadados
 - **Delta Lake**: Formato de tabela com transações ACID
 
@@ -16,7 +16,7 @@ O projeto implementa um data lake completo usando tecnologias open source:
 
 ```mermaid
 graph TD
-    A[Aplicações] --> B[Trino]
+    A[Aplicações] --> B[Dremio]
     A --> C[Spark]
     B --> D[Hive Metastore]
     C --> D
@@ -29,7 +29,7 @@ graph TD
 
 - ✨ **Armazenamento Escalável**: Armazenamento de objetos compatível com S3 usando MinIO
 - 🚀 **Processamento Distribuído**: Processamento de dados com Apache Spark
-- 📊 **Consultas SQL**: Consultas distribuídas com Trino
+- 📊 **Consultas SQL**: Consultas distribuídas com Dremio
 - 🔒 **Transações ACID**: Suporte a transações usando Delta Lake
 - 📝 **Metadados**: Gerenciamento de metadados com Hive Metastore
 - 🐳 **Containerizado**: Ambiente completo em containers Docker
@@ -44,7 +44,7 @@ Aprenda mais sobre cada componente do sistema:
 
 - [MinIO](components/minio.md): Armazenamento de objetos
 - [Spark](components/spark.md): Processamento de dados
-- [Trino](components/trino.md): Consultas SQL
+- [Dremio](components/dremio.md): Consultas SQL
 - [Hive Metastore](components/hive.md): Gerenciamento de metadados
 
 ## Tutoriais
