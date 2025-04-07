@@ -10,11 +10,13 @@ Antes de começar, certifique-se de ter instalado:
 - [Docker Compose](https://docs.docker.com/compose/install/) (versão 2.0 ou superior)
 - [Make](https://www.gnu.org/software/make/) (opcional, mas recomendado)
 
+> **Nota**: Como este projeto utiliza Docker, não é necessário instalar as dependências Python, Spark, Dremio ou outras ferramentas individualmente. Todos os componentes já estão configurados nas imagens Docker correspondentes.
+
 ## Instalação
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/data-lab.git
+git clone https://github.com/edvaldo-gutierres/data-lab.git
 cd data-lab
 ```
 
@@ -29,6 +31,8 @@ Este comando irá:
 - Iniciar todos os serviços
 - Criar o bucket `raw` no MinIO
 
+Após executar este comando, todos os serviços estarão disponíveis e configurados automaticamente.
+
 ## Verificação
 
 Após a instalação, verifique se todos os serviços estão rodando:
@@ -40,7 +44,7 @@ docker ps
 Você deverá ver os seguintes containers:
 - `data-lab-minio-1`
 - `data-lab-spark-1`
-- `data-lab-trino-1`
+- `data-lab-dremio-1`
 - `data-lab-hive-metastore-1`
 - `data-lab-mariadb-1`
 
@@ -58,9 +62,9 @@ Você deverá ver os seguintes containers:
 ### Spark UI
 - Interface: [http://localhost:4040](http://localhost:4040)
 
-### Trino
-- Interface: [http://localhost:8080](http://localhost:8080)
-- Sem senha
+### Dremio
+- Interface: [http://localhost:9047](http://localhost:9047)
+- No primeiro acesso, será necessário criar uma senha.
 
 ## Estrutura de Diretórios
 
@@ -70,7 +74,7 @@ Você deverá ver os seguintes containers:
 ├── hive/              # Configurações do Hive
 ├── notebooks/         # Jupyter notebooks
 ├── spark/            # Configurações do Spark
-└── trino/            # Configurações do Trino
+└── dremio/            # Configurações do Dremio
 ```
 
 ## Próximos Passos
@@ -120,8 +124,8 @@ make logs-minio
 # Spark
 make logs-spark
 
-# Trino
-make logs-trino
+# Dremio
+make logs-dremio
 
 # Hive Metastore
 make logs-hive

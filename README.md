@@ -29,9 +29,9 @@ O projeto consiste nos seguintes componentes:
 │   └── requirements.txt        # Dependências Python
 ├── spark/                # Configurações do Spark
 │   └── Dockerfile       # Imagem do Spark
-├── trino/                # Configurações do Trino
-│   ├── Dockerfile       # Imagem do Trino
-│   └── etc/             # Configurações do Trino
+├── dremio/                # Configurações do Dremio
+│   ├── Dockerfile       # Imagem do Dremio
+│   └── etc/             # Configurações do Dremio
 │       ├── catalog/     # Configurações dos catalogs
 │       │   ├── hive.properties    # Configuração do catalog Hive
 │       │   └── minio.properties   # Configuração do catalog MinIO
@@ -85,7 +85,7 @@ make up
 
 - `make up`: Inicia todos os serviços
 - `make down`: Para todos os serviços
-- `make logs-trino`: Mostra logs do Trino
+- `make logs-dremio`: Mostra logs do Dremio
 - `make logs-spark`: Mostra logs do Spark
 - `make clean`: Remove containers e imagens
 

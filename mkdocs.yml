@@ -1,7 +1,7 @@
 site_name: Data Lake Documentation
-site_description: Documentação do projeto Data Lake com MinIO, Spark e Trino
-site_author: Time de Data Engineering
-repo_url: https://github.com/seu-usuario/data-lab
+site_description: Documentação do projeto Data Lake com MinIO, Spark e Dremio
+site_author: Edvaldo Gutierres
+repo_url: https://github.com/edvaldo-gutierres/data-lab
 
 theme:
   name: material
@@ -56,7 +56,7 @@ nav:
   - Componentes:
     - MinIO: components/minio.md
     - Spark: components/spark.md
-    - Trino: components/trino.md
+    - Dremio: components/dremio.md
     - Hive Metastore: components/hive.md
   - Tutoriais:
     - Ingestão de Dados: tutorials/data-ingestion.md
