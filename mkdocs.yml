@@ -58,6 +58,9 @@ nav:
     - Spark: components/spark.md
     - Dremio: components/dremio.md
     - Hive Metastore: components/hive.md
+    - Airflow: components/airflow.md
+    - Airbyte: components/airbyte.md
+    - OpenMetadata: components/openmetadata.md
   - Tutoriais:
     - Ingestão de Dados: tutorials/data-ingestion.md
     - Consultas SQL: tutorials/sql-queries.md

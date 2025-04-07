@@ -6,15 +6,15 @@ Esta seção contém respostas para as perguntas mais frequentes sobre o uso do 
 
 ### O que é o Data Lake?
 
-Este projeto implementa um data lake completo usando tecnologias open source como MinIO (armazenamento de objetos), Apache Spark (processamento de dados), Dremio (consultas SQL) e Delta Lake (formato de tabela com transações ACID).
+Este projeto implementa um data lake completo usando tecnologias open source como MinIO (armazenamento de objetos), Apache Spark (processamento de dados), Dremio (consultas SQL), Delta Lake (formato de tabela com transações ACID), Airflow (orquestração), Airbyte (integração de dados) e OpenMetadata (governança).
 
 ### Quais são os requisitos mínimos para executar o Data Lake?
 
 - Docker 20.10 ou superior
 - Docker Compose 2.0 ou superior
-- 8GB de RAM
+- 12GB de RAM (recomendado)
 - 4 cores de CPU
-- 20GB de espaço em disco
+- 30GB de espaço em disco
 
 ### Posso executar o Data Lake sem Docker?
 
@@ -112,6 +112,127 @@ deltaTable.update(
 )
 ```
 
+## Airflow
+
+### Como acessar a interface do Airflow?
+
+Acesse http://localhost:8080 em seu navegador. Use o usuário `airflow` e senha `airflow` para fazer login.
+
+### Como criar um novo fluxo de trabalho (DAG) no Airflow?
+
+Crie um arquivo Python no diretório `airflow/dags/` com a definição do DAG. Exemplo:
+
+```python
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+def hello_world():
+    return "Olá, mundo!"
+
+dag = DAG(
+    'hello_world',
+    start_date=datetime(2023, 1, 1),
+    schedule_interval='@daily'
+)
+
+task = PythonOperator(
+    task_id='hello_task',
+    python_callable=hello_world,
+    dag=dag
+)
+```
+
+### Como agendar a execução de um DAG?
+
+Configure o parâmetro `schedule_interval` na definição do DAG:
+- `@daily`: uma vez por dia
+- `@hourly`: uma vez por hora
+- `0 0 * * *`: cron syntax (neste exemplo, meia-noite todos os dias)
+
+### Como conectar o Airflow ao MinIO ou ao Spark?
+
+Para o MinIO, use o operador S3 e configure uma conexão do tipo "Amazon S3":
+- Conn Id: minio_s3
+- Extra: `{"host": "http://minio:9000", "aws_access_key_id": "minioadmin", "aws_secret_access_key": "minioadmin"}`
+
+Para o Spark, use o SparkSubmitOperator:
+```python
+from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
+
+spark_task = SparkSubmitOperator(
+    task_id='processar_dados',
+    application='/opt/airflow/dags/scripts/processar_dados.py',
+    conn_id='spark_default',
+    dag=dag
+)
+```
+
+## Airbyte
+
+### Como acessar a interface do Airbyte?
+
+Acesse http://localhost:8000 em seu navegador.
+
+### Como configurar uma fonte de dados no Airbyte?
+
+1. Acesse a interface do Airbyte
+2. Clique em "Sources" e depois em "+ New source"
+3. Selecione o tipo de fonte (banco de dados, API, etc.)
+4. Configure os parâmetros de conexão como host, usuário, senha, etc.
+5. Teste a conexão e salve a configuração
+
+### Como configurar um destino para os dados no Airbyte?
+
+1. Clique em "Destinations" e depois em "+ New destination"
+2. Para salvar no MinIO, selecione "S3" como tipo de destino
+3. Configure:
+   - Nome: MinIO
+   - S3 Endpoint: http://minio:9000
+   - Access Key: minioadmin
+   - Secret Key: minioadmin
+   - Bucket: raw
+   - Path: airbyte_data
+4. Teste a conexão e salve
+
+### Como criar uma sincronização de dados no Airbyte?
+
+1. Clique em "Connections" e depois em "+ New connection"
+2. Selecione a fonte e o destino configurados anteriormente
+3. Selecione as tabelas/streams que deseja sincronizar
+4. Configure a frequência de sincronização
+5. Clique em "Set up connection"
+
+## OpenMetadata
+
+### Como acessar a interface do OpenMetadata?
+
+Acesse http://localhost:8585 em seu navegador. Use o usuário `admin` e senha `admin` para fazer login.
+
+### Como adicionar fontes de dados ao OpenMetadata?
+
+1. Acesse a interface do OpenMetadata
+2. Vá para "Settings" > "Services" > "Add New Service"
+3. Selecione o tipo de serviço (Dremio, S3, Hive, etc.)
+4. Configure os parâmetros de conexão
+5. Teste a conexão e salve
+
+### O que são os testes de qualidade no OpenMetadata?
+
+Os testes de qualidade permitem verificar se os dados atendem a determinados critérios, como:
+- Valores não nulos
+- Unicidade de valores
+- Intervalos válidos
+- Formatos específicos (email, CEP, etc.)
+
+Você pode configurar esses testes na página de detalhes de uma tabela, na aba "Quality".
+
+### Como visualizar a linhagem (lineage) dos dados?
+
+1. Acesse a página de detalhes de uma tabela ou asset
+2. Clique na aba "Lineage"
+3. Visualize o grafo de linhagem mostrando a origem e destino dos dados
+
 ## Solução de Problemas
 
 ### Os serviços falham ao iniciar, o que pode ser?
@@ -144,6 +265,15 @@ make logs-dremio
 
 # Hive Metastore
 make logs-hive
+
+# Airflow
+make logs-airflow
+
+# Airbyte
+make logs-airbyte
+
+# OpenMetadata
+make logs-openmetadata
 ```
 
 ### Como redefinir tudo e começar do zero?
@@ -166,3 +296,6 @@ Consulte o [Guia de Contribuição](development/contributing.md) para obter inst
 - [Apache Spark](https://spark.apache.org/docs/latest/)
 - [Dremio](https://docs.dremio.com/)
 - [Delta Lake](https://delta.io/documentation/)
+- [Apache Airflow](https://airflow.apache.org/docs/)
+- [Airbyte](https://docs.airbyte.com/)
+- [OpenMetadata](https://docs.open-metadata.org/)

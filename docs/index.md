@@ -1,6 +1,6 @@
 # Bem-vindo ao Data Lake
 
-Esta é a documentação oficial do projeto Data Lake, uma solução moderna e escalável para armazenamento e processamento de dados usando MinIO, Apache Spark e Dremio.
+Esta é a documentação oficial do projeto Data Lake, uma solução moderna e escalável para armazenamento, processamento, integração, orquestração e governança de dados.
 
 ## Visão Geral
 
@@ -11,6 +11,9 @@ O projeto implementa um data lake completo usando tecnologias open source:
 - **Dremio**: Consultas SQL distribuídas
 - **Hive Metastore**: Gerenciamento de metadados
 - **Delta Lake**: Formato de tabela com transações ACID
+- **Airflow**: Orquestração de fluxos de trabalho
+- **Airbyte**: Integração e ingestão de dados
+- **OpenMetadata**: Catalogação e governança de dados
 
 ## Arquitetura
 
@@ -18,11 +21,25 @@ O projeto implementa um data lake completo usando tecnologias open source:
 graph TD
     A[Aplicações] --> B[Dremio]
     A --> C[Spark]
+    
+    F[Airflow] --> B
+    F --> C
+    F --> G[Airbyte]
+    
+    G --> E[MinIO]
+    
     B --> D[Hive Metastore]
     C --> D
-    B --> E[MinIO]
+    
+    B --> E
     C --> E
     D --> E
+    
+    H[OpenMetadata] --> B
+    H --> C
+    H --> D
+    H --> E
+    H --> G
 ```
 
 ## Principais Recursos
@@ -33,6 +50,9 @@ graph TD
 - 🔒 **Transações ACID**: Suporte a transações usando Delta Lake
 - 📝 **Metadados**: Gerenciamento de metadados com Hive Metastore
 - 🐳 **Containerizado**: Ambiente completo em containers Docker
+- 🔄 **Orquestração**: Fluxos de trabalho e agendamento com Apache Airflow
+- 📥 **Ingestão de Dados**: Integração com diversas fontes de dados via Airbyte
+- 📚 **Governança**: Catalogação e linhagem de dados com OpenMetadata
 
 ## Começando
 
@@ -46,6 +66,9 @@ Aprenda mais sobre cada componente do sistema:
 - [Spark](components/spark.md): Processamento de dados
 - [Dremio](components/dremio.md): Consultas SQL
 - [Hive Metastore](components/hive.md): Gerenciamento de metadados
+- [Airflow](components/airflow.md): Orquestração de fluxos de trabalho
+- [Airbyte](components/airbyte.md): Integração de dados
+- [OpenMetadata](components/openmetadata.md): Catalogação e governança
 
 ## Tutoriais
 

@@ -13,6 +13,11 @@ services:
       - ./data:/data
     networks:
       - datalake-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
   spark:
     image: my-spark
@@ -73,6 +78,197 @@ services:
     networks:
       - datalake-network
 
+  # Início dos novos serviços
+
+  # Airflow
+  airflow-postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+    networks:
+      - datalake-network
+
+  airflow-webserver:
+    image: apache/airflow:2.6.1
+    depends_on:
+      - airflow-postgres
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      - AIRFLOW__CORE__FERNET_KEY=''
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__API__AUTH_BACKENDS=airflow.api.auth.backend.basic_auth
+      - _AIRFLOW_DB_UPGRADE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=airflow
+      - _AIRFLOW_WWW_USER_PASSWORD=airflow
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config:/opt/airflow/config
+    ports:
+      - "8080:8080"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - datalake-network
+
+  airflow-scheduler:
+    image: apache/airflow:2.6.1
+    depends_on:
+      - airflow-webserver
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-postgres/airflow
+      - AIRFLOW__CORE__FERNET_KEY=''
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config:/opt/airflow/config
+    command: scheduler
+    networks:
+      - datalake-network
+
+  # Airbyte
+  airbyte-db:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=airbyte
+    volumes:
+      - airbyte-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - datalake-network
+
+  airbyte-temporal:
+    image: airbyte/temporal:0.44.4
+    restart: unless-stopped
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PWD=postgres
+      - POSTGRES_SEEDS=airbyte-db
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development.yaml
+    networks:
+      - datalake-network
+    depends_on:
+      airbyte-db:
+        condition: service_healthy
+
+  airbyte-server:
+    image: airbyte/server:0.44.4
+    restart: unless-stopped
+    depends_on:
+      airbyte-db:
+        condition: service_healthy
+      airbyte-temporal:
+        condition: service_started
+    environment:
+      - CONFIGS_DATABASE_MINIMUM_FLYWAY_MIGRATION_VERSION=0.35.15.001
+      - DATABASE_URL=jdbc:postgresql://airbyte-db:5432/airbyte
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - WORKSPACE_ROOT=/workspace
+      - CONFIG_ROOT=/data
+      - TRACKING_STRATEGY=logging
+      - AIRBYTE_VERSION=0.44.4
+      - WORKER_ENVIRONMENT=docker
+      - LOG_LEVEL=INFO
+      - INIT_CONTAINER_TIMEOUT_MINUTES=15
+      - TEMPORAL_HOST=airbyte-temporal:7233
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./airbyte/workspace:/workspace
+      - ./airbyte/data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - datalake-network
+
+  airbyte-webapp:
+    image: airbyte/webapp:0.44.4
+    restart: unless-stopped
+    depends_on:
+      - airbyte-server
+    ports:
+      - "8000:80"
+    environment:
+      - AIRBYTE_VERSION=0.44.4
+      - API_URL=/api/v1/
+      - INTERNAL_API_HOST=airbyte-server:8001
+      - FULLSTORY=disabled
+      - TRACKING_STRATEGY=logging
+    networks:
+      - datalake-network
+
+  # OpenMetadata
+  openmetadata-mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=openmetadata_password
+      - MYSQL_USER=openmetadata_user
+      - MYSQL_PASSWORD=openmetadata_password
+      - MYSQL_DATABASE=openmetadata_db
+    volumes:
+      - openmetadata-mysql-data:/var/lib/mysql
+    networks:
+      - datalake-network
+    healthcheck:
+      test: mysqladmin ping -h localhost -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  openmetadata:
+    image: openmetadata/server:0.12.3
+    depends_on:
+      - openmetadata-mysql
+    environment:
+      # Database configuration
+      - OPENMETADATA_CATALOG_DATABASE_USER=openmetadata_user
+      - OPENMETADATA_CATALOG_DATABASE_PASSWORD=openmetadata_password
+      - OPENMETADATA_CATALOG_DATABASE_HOST=openmetadata-mysql
+      - OPENMETADATA_CATALOG_DATABASE_PORT=3306
+      # Airflow configuration
+      - AIRFLOW_HOST=http://airflow-webserver:8080
+      # Adicionar essa variável para corrigir o problema de conexão
+      - DB_HOST=openmetadata-mysql
+    ports:
+      - "8585:8585"
+    networks:
+      - datalake-network
+
 networks:
   datalake-network:
-    external: true 
+    external: true
+
+volumes:
+  airflow-postgres-db-volume:
+  airbyte-db-volume:
+  openmetadata-mysql-data: 
