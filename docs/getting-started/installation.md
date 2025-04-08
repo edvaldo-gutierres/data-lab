@@ -66,6 +66,13 @@ Você deverá ver os seguintes containers:
 - Interface: [http://localhost:9047](http://localhost:9047)
 - No primeiro acesso, será necessário criar uma senha.
 
+### OpenMetadata
+- Interface: [http://localhost:8585](http://localhost:8585)
+
+### Airbyte
+- Interface: [http://localhost:8000](http://localhost:8000)
+- Para obter as credenciais: `make airbyte-credentials`
+
 ## Estrutura de Diretórios
 
 ```
@@ -73,7 +80,7 @@ Você deverá ver os seguintes containers:
 ├── data/              # Dados do MinIO
 ├── hive/              # Configurações do Hive
 ├── notebooks/         # Jupyter notebooks
-├── spark/            # Configurações do Spark
+├── spark/             # Configurações do Spark
 └── dremio/            # Configurações do Dremio
 ```
 

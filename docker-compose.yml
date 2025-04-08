@@ -146,86 +146,6 @@ services:
     networks:
       - datalake-network
 
-  # Airbyte
-  airbyte-db:
-    image: postgres:13
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=airbyte
-    volumes:
-      - airbyte-db-volume:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - datalake-network
-
-  airbyte-temporal:
-    image: airbyte/temporal:0.44.4
-    restart: unless-stopped
-    environment:
-      - DB=postgresql
-      - DB_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PWD=postgres
-      - POSTGRES_SEEDS=airbyte-db
-      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development.yaml
-    networks:
-      - datalake-network
-    depends_on:
-      airbyte-db:
-        condition: service_healthy
-
-  airbyte-server:
-    image: airbyte/server:0.44.4
-    restart: unless-stopped
-    depends_on:
-      airbyte-db:
-        condition: service_healthy
-      airbyte-temporal:
-        condition: service_started
-    environment:
-      - CONFIGS_DATABASE_MINIMUM_FLYWAY_MIGRATION_VERSION=0.35.15.001
-      - DATABASE_URL=jdbc:postgresql://airbyte-db:5432/airbyte
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgres
-      - WORKSPACE_ROOT=/workspace
-      - CONFIG_ROOT=/data
-      - TRACKING_STRATEGY=logging
-      - AIRBYTE_VERSION=0.44.4
-      - WORKER_ENVIRONMENT=docker
-      - LOG_LEVEL=INFO
-      - INIT_CONTAINER_TIMEOUT_MINUTES=15
-      - TEMPORAL_HOST=airbyte-temporal:7233
-    ports:
-      - "8001:8001"
-    volumes:
-      - ./airbyte/workspace:/workspace
-      - ./airbyte/data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - datalake-network
-
-  airbyte-webapp:
-    image: airbyte/webapp:0.44.4
-    restart: unless-stopped
-    depends_on:
-      - airbyte-server
-    ports:
-      - "8000:80"
-    environment:
-      - AIRBYTE_VERSION=0.44.4
-      - API_URL=/api/v1/
-      - INTERNAL_API_HOST=airbyte-server:8001
-      - FULLSTORY=disabled
-      - TRACKING_STRATEGY=logging
-    networks:
-      - datalake-network
-
   # OpenMetadata
   openmetadata-mysql:
     image: mysql:8
@@ -266,9 +186,8 @@ services:
 
 networks:
   datalake-network:
-    external: true
+    external: false
 
 volumes:
   airflow-postgres-db-volume:
-  airbyte-db-volume:
   openmetadata-mysql-data: 

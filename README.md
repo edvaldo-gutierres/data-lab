@@ -11,6 +11,7 @@ O projeto consiste nos seguintes componentes:
 - **Dremio**: Plataforma de análise de dados
 - **Hive Metastore**: Gerenciamento de metadados para tabelas
 - **MariaDB**: Banco de dados para o Hive Metastore
+- **Airbyte**: Plataforma de integração de dados (gerenciada via abctl)
 
 ## Estrutura do Projeto
 
@@ -52,6 +53,7 @@ O projeto consiste nos seguintes componentes:
 - Docker
 - Docker Compose
 - Make
+- abctl (instalado automaticamente se necessário)
 
 ## Instalação
 
@@ -81,6 +83,10 @@ make up
 - **Dremio UI**: http://localhost:9047
   - Interface web do Dremio
 
+- **Airbyte UI**: http://localhost:8000
+  - Interface web do Airbyte
+  - Credenciais: execute `make airbyte-credentials` para obter
+
 ## Comandos Disponíveis
 
 - `make up`: Inicia todos os serviços
@@ -88,6 +94,8 @@ make up
 - `make logs-dremio`: Mostra logs do Dremio
 - `make logs-spark`: Mostra logs do Spark
 - `make clean`: Remove containers e imagens
+- `make airbyte-status`: Verifica o status do Airbyte
+- `make airbyte-credentials`: Mostra credenciais do Airbyte
 
 ## Armazenamento
 
@@ -101,6 +109,7 @@ O ambiente está configurado para suportar:
    - Upload direto para o MinIO
    - Processamento via Spark
    - Armazenamento em formato Delta Lake
+   - Integração com Airbyte para ETL
 
 2. **Consultas**:
    - SQL via Dremio
@@ -128,6 +137,11 @@ O ambiente está configurado para suportar:
 - Porta: 9083
 - Banco de dados: MariaDB
 
+### Airbyte
+- Gerenciado via abctl
+- Porta: 8000
+- Acesso: execute `make airbyte-credentials` para obter credenciais
+
 ## Desenvolvimento
 
 Para desenvolvimento local:
@@ -136,6 +150,7 @@ Para desenvolvimento local:
 2. Os dados podem ser acessados via MinIO ou diretamente no filesystem
 3. O Hive Metastore gerencia os metadados das tabelas
 4. O Dremio permite consultas SQL sobre os dados
+5. O Airbyte permite integrar dados de diversas fontes
 
 ## Troubleshooting
 
@@ -144,6 +159,7 @@ Para desenvolvimento local:
 - Spark: `docker logs data-lab-spark-1`
 - Dremio: `docker logs data-lab-dremio-1`
 - Hive: `docker logs data-lab-hive-metastore-1`
+- Airbyte: `make airbyte-logs`
 
 ### Problemas Comuns
 1. Se o Hive Metastore falhar ao iniciar:
@@ -155,6 +171,11 @@ Para desenvolvimento local:
    - Verifique se o bucket 'raw' existe
    - Confirme as credenciais do MinIO
    - Verifique a conectividade entre os containers
+
+3. Se o Airbyte apresentar problemas:
+   - Verifique o status com `make airbyte-status`
+   - Veja os logs com `make airbyte-logs`
+   - Reinicie com `make airbyte-stop` seguido de `make airbyte-start`
 
 ## Contribuição
 
@@ -244,13 +265,26 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para d
    SELECT * FROM minha_tabela;
    ```
 
+### Airbyte
+1. **Interface Web**:
+   - URL: http://localhost:8000
+   - Credenciais: Execute `make airbyte-credentials` para obter
+   - Funcionalidades:
+     - Configuração de conectores de origem e destino
+     - Sincronização de dados
+     - Monitoramento de jobs
+     - Agendamento de sincronizações
+
+2. **Exemplo de Uso**:
+   ```bash
+   # Obter credenciais
+   make airbyte-credentials
+   
+   # Verificar status
+   make airbyte-status
+   ```
+
 ### Hive Metastore
 1. **API Thrift**:
    - Endpoint: thrift://localhost:9083
    - Usado internamente pelo Spark e Dremio
-   - Não requer acesso direto
-
-2. **Beeline**:
-   ```bash
-   docker exec -it data-lab-hive-metastore-1 beeline -u jdbc:hive2://localhost:10000
-   ```
