@@ -25,6 +25,7 @@ O projeto consiste nos seguintes componentes:
 - **Hive Metastore**: Gerenciamento de metadados para tabelas
 - **MariaDB**: Banco de dados para o Hive Metastore
 - **Airbyte**: Plataforma de integração de dados (gerenciada via abctl)
+- **Metabase**: Ferramenta de visualização e dashboards
 
 ## Estrutura do Projeto
 
@@ -100,6 +101,10 @@ make up
   - Interface web do Airbyte
   - Credenciais: execute `make airbyte-credentials` para obter
 
+- **Metabase**: http://localhost:3000
+  - Interface web do Metabase
+  - Configuração inicial na primeira execução
+
 ## Comandos Disponíveis
 
 - `make up`: Inicia todos os serviços
@@ -155,6 +160,12 @@ O ambiente está configurado para suportar:
 - Porta: 8000
 - Acesso: execute `make airbyte-credentials` para obter credenciais
 
+### Metabase
+- Versão: latest
+- Porta: 3000
+- Banco de dados: PostgreSQL
+- Timezone: America/Sao_Paulo
+
 ## Desenvolvimento
 
 Para desenvolvimento local:
@@ -173,6 +184,7 @@ Para desenvolvimento local:
 - Dremio: `docker logs data-lab-dremio-1`
 - Hive: `docker logs data-lab-hive-metastore-1`
 - Airbyte: `make airbyte-logs`
+- Metabase: `make logs-metabase`
 
 ### Problemas Comuns
 1. Se o Hive Metastore falhar ao iniciar:
@@ -301,3 +313,36 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo LICENSE para d
 1. **API Thrift**:
    - Endpoint: thrift://localhost:9083
    - Usado internamente pelo Spark e Dremio
+
+### Metabase
+1. **Interface Web**:
+   - URL: http://localhost:3000
+   - Configuração inicial na primeira execução
+   - Funcionalidades:
+     - Criação de dashboards
+     - Visualizações interativas
+     - Conexão com diversas fontes de dados
+     - Agendamento de relatórios
+
+2. **Conectando ao MinIO via Dremio**:
+   ```
+   # Na configuração inicial ou em Configurações > Admin > Databases
+   Tipo: Dremio JDBC
+   Nome: Dremio
+   Host: dremio
+   Porta: 31010
+   Banco de dados: (deixar em branco)
+   Nome de usuário: (seu usuário do Dremio)
+   Senha: (sua senha do Dremio)
+   ```
+
+3. **Criando Dashboards**:
+   - Após configurar a conexão com o Dremio, você pode criar consultas e dashboards a partir dos dados armazenados no MinIO
+   - Utilize o editor visual ou SQL para gerar suas visualizações
+   - Construa dashboards combinando diferentes visualizações
+   - Configure atualizações automáticas para seus dashboards
+
+4. **Compartilhamento e Alertas**:
+   - Compartilhe dashboards com outros usuários
+   - Configure alertas para monitorar suas métricas
+   - Agende o envio de relatórios por e-mail

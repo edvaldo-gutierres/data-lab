@@ -1,4 +1,4 @@
-.PHONY: network build-dremio build-spark up down logs-dremio logs-spark logs-airflow logs-openmetadata clean help create-bucket create-dirs airbyte-install airbyte-start airbyte-stop airbyte-status airbyte-logs airbyte-credentials
+.PHONY: network build-dremio build-spark up down logs-dremio logs-spark logs-airflow logs-openmetadata clean help create-bucket create-dirs airbyte-install airbyte-start airbyte-stop airbyte-status airbyte-logs airbyte-credentials logs-metabase metabase-reset
 
 # Variáveis
 DOCKER_COMPOSE := docker-compose
@@ -39,6 +39,8 @@ help:
 	@echo "  $(GREEN)make airbyte-status$(NC)    - Verifica o status do Airbyte usando abctl"
 	@echo "  $(GREEN)make airbyte-credentials$(NC) - Mostra credenciais do Airbyte"
 	@echo "  $(GREEN)make airbyte-logs$(NC)      - Mostra logs do Airbyte usando abctl"
+	@echo "  $(GREEN)make logs-metabase$(NC)      - Mostra logs do Metabase"
+	@echo "  $(GREEN)make metabase-reset$(NC)     - Reinicia o Metabase"
 
 # Cria a rede Docker
 network:
@@ -139,6 +141,11 @@ logs-openmetadata:
 	@echo "Logs do OpenMetadata..."
 	docker logs $(OPENMETADATA_CONTAINER)
 
+# Mostra logs do Metabase
+logs-metabase:
+	@echo "Logs do Metabase..."
+	docker logs -f data-lab-metabase-1
+
 # Comandos do Airbyte via abctl
 airbyte-install:
 	@echo "$(YELLOW)Instalando Airbyte via abctl...$(NC)"
@@ -179,6 +186,15 @@ airbyte-credentials:
 airbyte-logs:
 	@echo "$(YELLOW)Mostrando logs do Airbyte via abctl...$(NC)"
 	abctl local logs
+
+# Reinicia o Metabase
+metabase-reset:
+	@echo "Removendo banco de dados do Metabase..."
+	$(DOCKER_COMPOSE) down metabase metabase-db
+	docker volume rm data-lab_metabase-db-data || true
+	@echo "Reiniciando Metabase..."
+	$(DOCKER_COMPOSE) up -d metabase-db metabase
+	@echo "Metabase reiniciado com sucesso!"
 
 # Limpa tudo
 clean: down
