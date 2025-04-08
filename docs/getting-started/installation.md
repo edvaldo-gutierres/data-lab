@@ -33,6 +33,34 @@ Este comando irá:
 
 Após executar este comando, todos os serviços estarão disponíveis e configurados automaticamente.
 
+## Configuração do Airbyte
+
+O Airbyte é gerenciado separadamente usando a ferramenta `abctl`. Durante a execução de `make up`, o sistema tenta instalar e iniciar o Airbyte automaticamente, mas esse processo pode falhar em alguns ambientes.
+
+Se o Airbyte não iniciar automaticamente, você pode configurá-lo manualmente usando os seguintes comandos:
+
+1. Instale o Airbyte:
+```bash
+make airbyte-install
+```
+
+2. Verifique o status da instalação:
+```bash
+make airbyte-status
+```
+
+3. Se necessário, inicie o Airbyte manualmente:
+```bash
+make airbyte-start
+```
+
+4. Para obter as credenciais de acesso:
+```bash
+make airbyte-credentials
+```
+
+> **Nota**: A primeira instalação do Airbyte pode levar vários minutos para ser concluída, dependendo da velocidade da sua conexão com a internet e do desempenho do seu computador.
+
 ## Verificação
 
 Após a instalação, verifique se todos os serviços estão rodando:
@@ -47,6 +75,10 @@ Você deverá ver os seguintes containers:
 - `data-lab-dremio-1`
 - `data-lab-hive-metastore-1`
 - `data-lab-mariadb-1`
+- `data-lab-metabase-1`
+- `data-lab-metabase-db-1`
+
+Além disso, se o Airbyte estiver em execução, você verá alguns containers adicionais com prefixo `airbyte`.
 
 ## Acessando os Serviços
 
@@ -73,6 +105,10 @@ Você deverá ver os seguintes containers:
 - Interface: [http://localhost:8000](http://localhost:8000)
 - Para obter as credenciais: `make airbyte-credentials`
 
+### Metabase
+- Interface: [http://localhost:3000](http://localhost:3000)
+- Configuração inicial na primeira execução
+
 ## Estrutura de Diretórios
 
 ```
@@ -91,6 +127,36 @@ Você deverá ver os seguintes containers:
 - Aprenda sobre [consultas SQL](../tutorials/sql-queries.md)
 
 ## Troubleshooting
+
+### Problemas com o Airbyte
+
+Se você encontrar problemas com o Airbyte:
+
+1. Verifique o status:
+```bash
+make airbyte-status
+```
+
+2. Se não estiver instalado, instale-o:
+```bash
+make airbyte-install
+```
+
+3. Se estiver instalado mas não em execução, inicie-o:
+```bash
+make airbyte-start
+```
+
+4. Verifique os logs para diagnóstico:
+```bash
+make airbyte-logs
+```
+
+5. Se necessário, pare e reinicie o Airbyte:
+```bash
+make airbyte-stop
+make airbyte-start
+```
 
 ### Portas em Uso
 

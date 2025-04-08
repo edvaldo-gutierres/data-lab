@@ -84,6 +84,21 @@ cd data-lab
 make up
 ```
 
+3. Se o Airbyte não iniciar automaticamente (o que pode acontecer no primeiro uso), instale-o manualmente:
+```bash
+make airbyte-install
+```
+
+Após a instalação, você pode verificar o status do Airbyte com:
+```bash
+make airbyte-status
+```
+
+E obter as credenciais de acesso com:
+```bash
+make airbyte-credentials
+```
+
 ## Serviços Disponíveis
 
 - **MinIO Console**: http://localhost:9001
@@ -113,9 +128,15 @@ make up
 - `make down`: Para todos os serviços
 - `make logs-dremio`: Mostra logs do Dremio
 - `make logs-spark`: Mostra logs do Spark
+- `make logs-metabase`: Mostra logs do Metabase
 - `make clean`: Remove containers e imagens
+- `make airbyte-install`: Instala o Airbyte usando abctl (execute este comando primeiro se o Airbyte não subir)
+- `make airbyte-start`: Inicia o Airbyte manualmente 
+- `make airbyte-stop`: Para o Airbyte
 - `make airbyte-status`: Verifica o status do Airbyte
 - `make airbyte-credentials`: Mostra credenciais do Airbyte
+- `make airbyte-logs`: Mostra logs do Airbyte
+- `make metabase-reset`: Reinicia o Metabase
 
 ## Armazenamento
 
