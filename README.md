@@ -17,6 +17,8 @@ Para utilização em ambientes de produção, seria necessário considerar vári
 
 ## Arquitetura
 
+![image](stack.png)
+
 O projeto consiste nos seguintes componentes:
 
 - **MinIO**: Servidor de armazenamento de objetos compatível com S3
