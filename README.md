@@ -59,7 +59,7 @@ O projeto consiste nos seguintes componentes:
 
 1. Clone o repositório:
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/edvaldo-gutierres/data-lab
 cd data-lab
 ```
 
