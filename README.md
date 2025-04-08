@@ -2,6 +2,19 @@
 
 Este projeto implementa um data lake utilizando MinIO como armazenamento de objetos, Apache Spark para processamento de dados e Dremio para consultas SQL. O ambiente é containerizado usando Docker e inclui um Hive Metastore para gerenciamento de metadados.
 
+## Propósito do Projeto
+
+Este projeto é destinado **exclusivamente para fins educacionais e de estudo**. A configuração atual utiliza uma implementação simplificada e containerizada que não é adequada para ambientes de produção.
+
+Para utilização em ambientes de produção, seria necessário considerar vários fatores adicionais, incluindo:
+
+- **Cluster Spark**: A implementação atual utiliza apenas uma instância Spark standalone. Para produção, seria necessário um cluster Spark adequadamente dimensionado e configurado.
+- **Segurança**: As configurações de segurança atuais são básicas e precisariam ser reforçadas para ambientes de produção.
+- **Escalabilidade**: O dimensionamento dos recursos computacionais deve ser adequado ao volume de dados.
+- **Alta Disponibilidade**: Implementação de redundância e failover para todos os componentes.
+- **Monitoramento e Alertas**: Ferramentas de monitoramento profissional para todo o ambiente.
+- **Backup e Recuperação**: Estratégias robustas de backup para garantir a integridade dos dados.
+
 ## Arquitetura
 
 O projeto consiste nos seguintes componentes:
